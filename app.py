@@ -78,7 +78,7 @@ def customers():
 
     if request.method == "GET":
         # mySQL query to grab all the people in Customers
-        query = "SELECT Customers.customerID, firstName, lastName, email, phone, address"
+        query = "SELECT Customers.customerID, firstName, lastName, email, phone, address FROM Customers"
         cur = mysql.connection.cursor()
         cur.execute(query)
         data = cur.fetchall()
@@ -130,7 +130,7 @@ def edit_customers(customerID):
             else:
                 query = "UPDATE Customers SET Customers.firstName = %s, Customers.lastName = %s, Customers.email = %s, Customers.phone = %s, Customers.address = %s WHERE Customers.customerID = %s"
                 cur = mysql.connection.cursor()
-                cur.execute(query, (firstName, lastName, email, phone, customerID))
+                cur.execute(query, (firstName, lastName, email, phone, address, customerID))
                 mysql.connection.commit()
 
             # redirect back to people page after we execute the update query
