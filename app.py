@@ -11,7 +11,6 @@
 Questions:
 1. The credentials don't seem to be working on db_connector... why?
     Needs to be connecting to classmysql and not classwork
-    Make sure you are connected to mysql first!!! solved.
 2. How do we implement smaller app.py files (per the video)
 
 """
@@ -141,5 +140,5 @@ def edit_customers(customerID):
 # Listener
 
 if __name__ == "__main__":
-    port = int(os.environ.get('PORT', 1234))
+    port = int(os.environ.get('PORT', 1425))
     app.run(port=port, debug=True)
