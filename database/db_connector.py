@@ -1,3 +1,8 @@
+# Citation for the following code:
+# Date: 05/19/2024
+# Copied from: CS 340 Flask Guide
+# Source URL: https://github.com/osu-cs340-ecampus/flask-starter-app
+
 import MySQLdb
 import os
 from dotenv import load_dotenv, find_dotenv
@@ -6,10 +11,10 @@ from dotenv import load_dotenv, find_dotenv
 load_dotenv(find_dotenv())
 
 # Set the variables in our application with those environment variables
-host = 'localhost'
-user = 'root'                                   # can be different if you set up another username in your MySQL installation
-passwd = 'nottellingyou'                        # set accordingly
-db = 'cs_340'  
+host = 'classmysql.engr.oregonstate.edu'      # MUST BE THIS
+user = 'cs340_swanbria'       # don't forget the cs340_ prefix
+passwd = 'IKWjiilHUyLz'               # should only be 4 digits if default
+db = 'cs340_swanbria'                                  
 
 def connect_to_database(host = host, user = user, passwd = passwd, db = db):
     '''
