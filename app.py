@@ -42,7 +42,7 @@ app.config["MYSQL_CURSORCLASS"] = "DictCursor"
 @app.route("/")
 def home():
     # return redirect("/customers")
-    return render_template('index.html', header="Home")
+    return render_template('index.html')
 
 @app.route('/customers', methods=["POST","GET"])
 def customers():
@@ -136,6 +136,11 @@ def edit_customers(customerID):
 
             # redirect back to people page after we execute the update query
             return redirect("/customers")
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
 
 
 # Listener
