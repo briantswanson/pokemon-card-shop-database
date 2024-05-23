@@ -3,49 +3,19 @@
 # Copied from: CS 340 Flask Guide
 # Source URL: https://github.com/osu-cs340-ecampus/flask-starter-app -->
 
-<html>
+{% extends "base.html" %}
 
-<head>
-	<title>Edit Customers</title>
-    <link href="style.css" rel="stylesheet" type="text/css" />
-</head>
+{% block content %}
 
-<body>
-    <div>
-        <table border="1" cellpadding="5"> 
-            <caption> Editing User: </caption>
-            <!-- Access data tuple passed from app.py -->
-            {% if data %}
-                <thead>
-                    <tr>
-                        <!-- Iterate through each key in the first entry to get the column name -->
-                        {% for key in data[0].keys() %}
-
-                        <!-- Create a <th> tag with the key inside of it, this will be our header row -->
-                        <th scope="col" data-field="{{ key }}" data-filter-control="input">{{ key }}</th>
-                        
-                        <!-- End of this for loop -->
-                        {% endfor %} 
-                    </tr>
-
-                <tbody>
-                    <!-- Now, iterate through every item in data -->
-                    {% for item in data %}
-                    <tr>
-                        <!-- Then iterate through every key in the current item dictionary -->
-                        {% for key in item.keys() %}
-                        
-                        <!-- Create a <td> element with the value of that key in it -->
-                        <td>{{item[key]}}</td> {% endfor %} 
-                    </tr> 
-                    {% endfor %} 
-            {% endif %} 
-        </table>
+<div id="browse">
+    {% include "table.html" %}
+<p>&nbsp;</p>
+</div>	<!-- browse -->
 
         <div id="edit">
             <!-- form to edit data in Customers-->
             <form id="editCustomer" action="/edit_customers/{{data[0].customerID}}" method="post">
-                <legend><strong>Edit Customer</strong></legend>
+                <legend>Update Fields:</legend>
                 <fieldset>
                     <!-- We can preset form inputs to match attributes currently stored for 'customerID' of Customer to be updated via value= and accessing our passed data tuple -->
                     <!-- Create hidden form input to store the passed 'customerID' of the Customer we are editing so we can access it easily in our 'POST' method in our app.py -->
@@ -58,13 +28,13 @@
                     <input type="text" value="{{data[0].lastName}}" class="form-control" id="lastName" name="lastName" pattern="[A-Za-z0-9]{1,}" required>
                     <label for="year">email:</label>
 
-                    <input type="text" value="{{data[0].email}}" class="form-control" id="email" name="email" pattern="[A-Za-z0-9]{1,}" required>
+                    <input type="email" value="{{data[0].email}}" class="form-control" id="email" name="email" pattern="[^ @]+@[^ @]+.[a-z]+" required>
                     <label for="color">phone:</label>
 
                     <input type="text" value="{{data[0].phone}}" class="form-control" id="phone" name="phone" pattern="[A-Za-z0-9]{1,}"> 
                     <label for="color">address:</label>
 
-                    <input type="text" value="{{data[0].address}}" class="form-control" id="address" name="address" pattern="[A-Za-z0-9]{1,}"> 
+                    <input type="text" value="{{data[0].address}}" class="form-control" id="address" name="address"> 
 
                 
                 </fieldset>
@@ -72,4 +42,4 @@
                 <a href='/customers'><input class="btn" type="button" value="cancel"></a>
             </form>
 
-</html>
+{% endblock %}

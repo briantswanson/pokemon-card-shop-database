@@ -5,42 +5,35 @@
   <meta charset="utf-8">
   <meta http-equiv='X-UA-Compatible' content="IE=edge">
   <meta name="robots" content="noindex, noarchive, nofollow" />
-  <title>PokÉmpire | Home</title>
+  <title>PokÉmpire</title>
   <link href="style.css" rel="stylesheet" type="text/css" />
+  <script src="{{url_for('static', filename='main.js')}}"></script>
 </head>
 
 <body>
   <header>
-    <h1>PokÉmpire</h1>
+    <h1>{{ header }}</h1>
   </header>
   <nav>
-    [ <a href="index.html">Home</a> | 
-    <a href="customers.html">Customers</a> |
-     <a href="employees.html">Employees</a> |
-    <a href="transactions.html">Transactions</a> |
-    <a href="products.html">Products</a> ]
+    <a href="/">Home</a> 
+    <a href="/customers">Customers</a> 
+    <a href="/employees">Employees</a> 
+    <a href="/transactions">Transactions</a> 
+    <a href="/products">Products</a> 
   </nav>
-
   <main>
 
 {% block content %}
 
 {% endblock %}
 
-
 </article>
-
-
-
 </section>
-
 </main>
 </body>
-
 <footer>
 <p>
 &copy; 2024 Nick Laustrup &amp; Brian Swanson
 </p>
 </footer>
-
 </html>

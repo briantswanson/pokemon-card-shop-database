@@ -41,7 +41,8 @@ app.config["MYSQL_CURSORCLASS"] = "DictCursor"
 # redirect page to Customers
 @app.route("/")
 def home():
-    return redirect("/customers")
+    # return redirect("/customers")
+    return render_template('index.html', header="Home")
 
 @app.route('/customers', methods=["POST","GET"])
 def customers():
@@ -83,7 +84,7 @@ def customers():
         cur.execute(query)
         data = cur.fetchall()
 
-    return render_template("customers.j2", data=data)
+    return render_template("customers.html", data=data, header="Customers")
 
 @app.route("/delete_customers/<int:customerID>")
 def delete_customers(customerID):
@@ -105,7 +106,7 @@ def edit_customers(customerID):
         cur.execute(query)
         data = cur.fetchall()
 
-        return render_template("edit_customers.j2", data=data)
+        return render_template("edit_customers.html", data=data, header="Customer")
     
     if request.method == "POST":
         # fire off if user clicks the 'Edit Customer' button
