@@ -28,6 +28,9 @@
                     <!-- Create our edit/delete buttons -->
                     <td><a href="edit_customers/{{item.customerID}}" class="btn btn-default">Edit</a></td>
                     <td><a href="delete_customers/{{item.customerID}}" class="btn btn-default">Delete</a></td>
+                    <!-- this does not work at the moment and creates 4 total buttons -->
+                    <td><a href="edit_employees/{{item.employeeID}}" class="btn btn-default">Edit</a></td>
+                    <td><a href="delete_employees/{{item.employeeID}}" class="btn btn-default">Delete</a></td>
                 </tr> 
                 {% endfor %} 
         {% endif %} 
