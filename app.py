@@ -137,6 +137,100 @@ def edit_customers(customerID):
             # redirect back to people page after we execute the update query
             return redirect("/customers")
 
+# Employees
+@app.route('/employees', methods=["POST","GET"])
+def employees():
+
+    if request.method == "POST":
+        # fire off if user presses the Add Person button
+        if request.form.get("Add_Employee"):
+            # grab user form inputs
+            firstName = request.form["firstName"]
+            lastName = request.form["lastName"]
+            email = request.form["email"]
+            phone = request.form["phone"]
+            wage = request.form["wage"]
+
+            # wage is null-able
+
+            if wage == "":
+                # mySQL query to insert a new person into Employees with our form inputs
+                query = "INSERT INTO Employees (firstName, lastName, email, phone) VALUES (%s, %s, %s, %s)"
+                cur = mysql.connection.cursor()
+                cur.execute(query, (firstName, lastName, email, phone))
+                mysql.connection.commit()
+            
+            # no null inputs
+
+            else:
+                query = "INSERT INTO Employees (firstName, lastName, email, phone, wage) VALUES (%s, %s,%s,%s, %s)"
+                cur = mysql.connection.cursor()
+                cur.execute(query, (firstName, lastName, email, phone, wage))
+                mysql.connection.commit()
+
+            # redirect back to Employees page
+            return redirect("/employees")
+
+    if request.method == "GET":
+        # mySQL query to grab all the people in Employees
+        query = "SELECT Employees.employeeID, firstName, lastName, email, phone, wage FROM Employees"
+        cur = mysql.connection.cursor()
+        cur.execute(query)
+        data = cur.fetchall()
+
+    return render_template("employees.html", data=data, header="Employees")
+
+@app.route("/delete_employees/<int:employeeID>")
+def delete_employees(employeeID):
+    # mySQL query to delete the employee with our passed employeeID
+    query = "DELETE FROM Employees WHERE employeeID = '%s';"
+    cur = mysql.connection.cursor()
+    cur.execute(query, (employeeID,))
+    mysql.connection.commit()
+
+    # redirect back to people page
+    return redirect("/employees")
+
+@app.route("/edit_employees/<int:employeeID>", methods=["POST", "GET"])
+def edit_employees(employeeID):
+    if request.method == "GET":
+        # mySQL query to grab the info of the employee with our passed employeeID
+        query = "SELECT * FROM Employees WHERE employeeID = %s" % (employeeID)
+        cur = mysql.connection.cursor()
+        cur.execute(query)
+        data = cur.fetchall()
+
+        return render_template("edit_employees.html", data=data, header="Employee")
+    
+    if request.method == "POST":
+        # fire off if user clicks the 'Edit Employee' button
+        if request.form.get("Edit_Employee"):
+            # grab user form inputs
+            employeeID = request.form["employeeID"]
+            firstName = request.form["firstName"]
+            lastName = request.form["lastName"]
+            email = request.form["email"]
+            phone = request.form["phone"]
+            wage = request.form["wage"]
+
+            # account for null wage
+            if (wage == "" or wage == "None"):
+                # mySQL query to update the attributes of employee with our passed employeeID value
+                query = "UPDATE Employees SET Employees.firstName = %s, Employees.lastName = %s, Employees.email = %s, Employees.phone = %s, Employees.wage = NULL WHERE Employees.employeeID = %s"
+                cur = mysql.connection.cursor()
+                cur.execute(query, (firstName, lastName, employeeID))
+                mysql.connection.commit()
+
+            # no null inputs
+            else:
+                query = "UPDATE Employees SET Employees.firstName = %s, Employees.lastName = %s, Employees.email = %s, Employees.phone = %s, Employees.wage = %s WHERE Employees.employeeID = %s"
+                cur = mysql.connection.cursor()
+                cur.execute(query, (firstName, lastName, email, phone, wage, employeeID))
+                mysql.connection.commit()
+
+            # redirect back to people page after we execute the update query
+            return redirect("/employees")
+
 
 @app.errorhandler(404)
 def page_not_found(e):
