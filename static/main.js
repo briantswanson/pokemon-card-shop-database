@@ -24,14 +24,16 @@ function browseCustomers() {
     showform('browse');
 }
 
+
 // LISTEN to the events
 document.addEventListener('DOMContentLoaded', () => {
     showform('browse');
 
 
-    const insertButton = document.getElementById('addNew');
-    insertButton.addEventListener('click', newCustomer);
+    const insertCustButton = document.getElementById('insert_customers');
+    insertCustButton.addEventListener('click', newCustomer);
 
-    const browseButton = document.getElementById('cancel');
-    browseButton.addEventListener('click', browseCustomers);
+    const cancelCustButton = document.getElementById('cancel');
+    cancelCustButton.addEventListener('click', browseCustomers);
+
 });

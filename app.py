@@ -106,7 +106,7 @@ def edit_customers(customerID):
         cur.execute(query)
         data = cur.fetchall()
 
-        return render_template("edit_customers.html", data=data, header="Customer")
+        return render_template("edit_customers.html", data=data, header="Customers")
     
     if request.method == "POST":
         # fire off if user clicks the 'Edit Customer' button
