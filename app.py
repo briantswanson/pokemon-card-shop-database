@@ -84,7 +84,7 @@ def customers():
         cur.execute(query)
         data = cur.fetchall()
 
-    return render_template("customers.html", data=data, header="Customers")
+    return render_template("customers.html", data=data, header="Customers", id_type="customerID")
 
 @app.route("/delete_customers/<int:customerID>")
 def delete_customers(customerID):
@@ -106,7 +106,7 @@ def edit_customers(customerID):
         cur.execute(query)
         data = cur.fetchall()
 
-        return render_template("edit_customers.html", data=data, header="Customers")
+        return render_template("edit_customers.html", data=data, header="Customers", id_type="customerID")
     
     if request.method == "POST":
         # fire off if user clicks the 'Edit Customer' button
@@ -178,7 +178,7 @@ def employees():
         cur.execute(query)
         data = cur.fetchall()
 
-    return render_template("employees.html", data=data, header="Employees")
+    return render_template("employees.html", data=data, header="Employees", id_type="employeeID")
 
 @app.route("/delete_employees/<int:employeeID>")
 def delete_employees(employeeID):
@@ -200,7 +200,7 @@ def edit_employees(employeeID):
         cur.execute(query)
         data = cur.fetchall()
 
-        return render_template("edit_employees.html", data=data, header="Employee")
+        return render_template("edit_employees.html", data=data, header="Employees")
     
     if request.method == "POST":
         # fire off if user clicks the 'Edit Employee' button
@@ -230,6 +230,121 @@ def edit_employees(employeeID):
 
             # redirect back to people page after we execute the update query
             return redirect("/employees")
+        
+        
+# Products
+@app.route('/products', methods=["POST","GET"])
+def products():
+
+    if request.method == "POST":
+        # fire off if user presses the Add Product button
+        if request.form.get("Add_Product"):
+            # grab user form inputs
+            
+            ####  PRODUCTS ####
+            inStock = request.form["inStock"]
+            price = request.form["price"]
+            
+            ####  PRODUCTDETAILS  ####
+            type = request.form["type"]
+            name = request.form["name"]
+            
+            ####  PRODUCTDETAILS  ####
+            query = "INSERT INTO ProductDetails (name, type) VALUES (%s, %s)"
+            cur = mysql.connection.cursor()
+            cur.execute(query, (name, type))
+            mysql.connection.commit()
+            
+            ####  PRODUCTS ####
+            query = "INSERT INTO Products (price, inStock, productDetailsID) VALUES (%s, %s, (SELECT productDetailsID FROM ProductDetails WHERE ProductDetails.name = %s LIMIT 1))"
+            cur = mysql.connection.cursor()
+            cur.execute(query, (price, inStock, name))
+            mysql.connection.commit()
+        
+
+            # redirect back to Products page
+            return redirect("/products")
+
+    if request.method == "GET":
+        # mySQL query to grab all the people in Products
+        query = "SELECT productID, price, inStock, type, name, Products.productDetailsID FROM Products JOIN ProductDetails ON Products.productDetailsID = ProductDetails.productDetailsID"
+        cur = mysql.connection.cursor()
+        cur.execute(query)
+        data = cur.fetchall()
+
+    return render_template("products.html", data=data, header="Products", id_type="productID")
+
+@app.route("/delete_products/<int:productID>")
+def delete_products(productID):
+    # mySQL query to delete the product with our passed productID
+    query = "DELETE FROM Products WHERE productID = '%s';"
+    cur = mysql.connection.cursor()
+    cur.execute(query, (productID,))
+    mysql.connection.commit()
+
+    # redirect back to product page
+    return redirect("/products")
+
+@app.route("/edit_products/<int:productID>", methods=["POST", "GET"])
+def edit_products(productID):
+    if request.method == "GET":
+        # mySQL query to grab the info of the product with our passed productID
+        query = """
+        SELECT productID, price, inStock, Products.productDetailsID, type, name FROM Products 
+        JOIN ProductDetails 
+        ON Products.productDetailsID = ProductDetails.productDetailsID 
+        WHERE productID = %s
+        """
+        cur = mysql.connection.cursor()
+        cur.execute(query, (productID,))
+        data = cur.fetchall()
+
+        return render_template("edit_products.html", data=data, header="Products", id_type="productID")
+    
+    if request.method == "POST":
+        # fire off if user presses the Add Product button
+        if request.form.get("Edit_Product"):
+            # grab user form inputs
+            
+            ####  PRODUCTS ####
+            inStock = request.form["inStock"]
+            price = request.form["price"]
+            
+            ####  PRODUCTDETAILS  ####
+            type = request.form["type"]
+            name = request.form["name"]
+            productDetailsID = request.form["productDetailsID"]
+
+
+            #     # mySQL query to update the attributes of product with our passed productID value
+            # query = "UPDATE Products SET Products.firstName = %s, Products.lastName = %s, Products.email = %s, Products.phone = %s, Products.wage = NULL WHERE Products.productID = %s"
+            # cur = mysql.connection.cursor()
+            # cur.execute(query, (firstName, lastName, productID))
+            # mysql.connection.commit()
+
+
+            ####  PRODUCTDETAILS  ####
+            query = """
+            UPDATE ProductDetails
+            SET ProductDetails.name = %s, ProductDetails.type = %s 
+            WHERE ProductDetails.productDetailsID = %s
+            """
+            cur = mysql.connection.cursor()
+            cur.execute(query, (name, type, productDetailsID))
+            mysql.connection.commit()
+            
+            ####  PRODUCTS ####
+            query = """
+            UPDATE Products 
+            SET Products.price = %s, Products.inStock = %s
+            WHERE Products.productID = %s
+            """
+            cur = mysql.connection.cursor()
+            cur.execute(query, (price, inStock, productID))
+            mysql.connection.commit()
+
+            # redirect back to people page after we execute the update query
+            return redirect("/products")
 
 
 @app.errorhandler(404)

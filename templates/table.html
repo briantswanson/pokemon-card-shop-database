@@ -12,7 +12,7 @@
             
                 <!-- End of this for loop -->
                 {% endfor %} 
-                <th colspan=2><button id="insert_{{ header|lower }}">Add New</button></th>
+                <th colspan=2><button id="add_new">Add New</button></th>
             </tr>
 
         <tbody>
@@ -26,11 +26,8 @@
                     {% endfor %}
 
                     <!-- Create our edit/delete buttons -->
-                    <td id="edit_{{ header|lower }}"><a href="edit_{{ header|lower }}/{{item.customerID}}" class="visible">Edit</a></td>
-                    <td id="delete_{{ header|lower }}"><a href="delete_{{ header|lower }}/{{item.customerID}}" class="visible">Delete</a></td>
-                    {# <!-- this does not work at the moment and creates 4 total buttons -->
-                    <td><a href="edit_employees/{{item.employeeID}}" class="btn btn-default">Edit</a></td>
-                    <td><a href="delete_employees/{{item.employeeID}}" class="btn btn-default">Delete</a></td> #}
+                    <td id="edit"><a href="edit_{{ header|lower }}/{{item[id_type]}}" class="visible">Edit</a></td>
+                    <td id="delete"><a href="delete_{{ header|lower }}/{{item[id_type]}}" class="visible">Delete</a></td>
                 </tr> 
                 {% endfor %} 
         {% endif %} 

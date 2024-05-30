@@ -16,11 +16,11 @@ function showform(dowhat) {
 }
 
 
-function newCustomer() {
+function insert() {
     showform('insert');
 }
 
-function browseCustomers() {
+function browse() {
     showform('browse');
 }
 
@@ -30,10 +30,10 @@ document.addEventListener('DOMContentLoaded', () => {
     showform('browse');
 
 
-    const insertCustButton = document.getElementById('insert_customers');
-    insertCustButton.addEventListener('click', newCustomer);
+    const insertButton = document.getElementById('add_new');
+    insertButton.addEventListener('click', insert);
 
-    const cancelCustButton = document.getElementById('cancel');
-    cancelCustButton.addEventListener('click', browseCustomers);
+    const cancelButton = document.getElementById('cancel');
+    cancelButton.addEventListener('click', browse);
 
 });
