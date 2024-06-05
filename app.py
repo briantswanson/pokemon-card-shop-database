@@ -346,6 +346,94 @@ def edit_products(productID):
             # redirect back to people page after we execute the update query
             return redirect("/products")
 
+# Transactions
+@app.route('/transactions', methods=["POST","GET"])
+def transactions():
+
+    if request.method == "POST":
+        # fire off if user presses the Add Person button
+        if request.form.get("Add_Transaction"):
+            # grab user form inputs
+            customerFirstName = request.form["customerFirstName"]
+            customerLastName = request.form["customerLastName"]
+            employeeFirstName = request.form["employeeFirstName"]
+            employeeLastName = request.form["employeeLastName"]
+            productID = request.form["productID"]
+            transactionID = request.form["transactionID"]
+
+            # mySQL query to insert a new transaction into Transactions and Transactions_has_Products
+            query1 = """INSERT INTO Transactions (customerID, employeeID)
+                        VALUES ((SELECT customerID FROM Customers WHERE firstName = %s AND lastName = %s),
+                        (SELECT employeeID FROM Employees WHERE firstName = %s AND lastName = %s)"""
+            
+            query2 = "INSERT INTO Transactions_has_Products (transactionID, productID) VALUES (%s, %s)"
+            cur = mysql.connection.cursor()
+            cur.execute(query1, (customerFirstName, customerLastName, employeeFirstName, employeeLastName))
+            cur.execute(query2, (transactionID, productID))
+            mysql.connection.commit()
+
+            # redirect back to Transactions page
+            return redirect("/transactions")
+
+    if request.method == "GET":
+        # mySQL query to grab all transactions
+        query = """SELECT transactionID, customerID, employeeID, productID, name, price FROM Transactions
+                INNER JOIN Transactions_has_Products
+                ON Transactions.transactionID = Transactions_has_Products.transactionID
+                INNER JOIN Products
+                ON Transactions_has_Products.productID = Products.productID;"""
+        cur = mysql.connection.cursor()
+        cur.execute(query)
+        data = cur.fetchall()
+
+    return render_template("transactions.html", data=data, header="Transactions", id_type="transactionID")
+
+@app.route("/delete_transactions/<int:transactionID>")
+def delete_transactionss(transactionID):
+    # mySQL query to delete the transaction with our passed transactionID
+    query = "DELETE FROM Transactions WHERE transactionID = '%s';"
+    cur = mysql.connection.cursor()
+    cur.execute(query, (transactionID,))
+    mysql.connection.commit()
+
+    # redirect back to transactions page
+    return redirect("/transactions")
+
+@app.route("/edit_transactions/<int:transactionID>", methods=["POST", "GET"])
+def edit_transactions(transactionID):
+    if request.method == "GET":
+        # mySQL query to grab the info of the transactions with our passed transactionID
+        query = "SELECT * FROM Transactions WHERE transactionID = %s" % (transactionID)
+        cur = mysql.connection.cursor()
+        cur.execute(query)
+        data = cur.fetchall()
+
+        return render_template("edit_transactions.html", data=data, header="Transactions")
+    
+    if request.method == "POST":
+        # fire off if user clicks the 'Edit Transaction' button
+        if request.form.get("Edit_Transaction"):
+            # grab user form inputs
+            customerFirstName = request.form["customerFirstName"]
+            customerLastName = request.form["customerLastName"]
+            employeeFirstName = request.form["employeeFirstName"]
+            employeeLastName = request.form["employeeLastName"]
+            productID = request.form["productID"]
+            transactionID = request.form["transactionID"]
+
+            query1 = """UPDATE Transactions SET Transactions.customerID = (SELECT customerID FROM Customers WHERE firstName = %s AND lastName = %s),
+                        Transactions.employeeID = (SELECT employeeID FROM Employees WHERE firstName = %s AND lastName = %s)"""
+            
+            query2 = "UPDATE Transactions_has_Products SET (transactionID, productID) VALUES (%s, %s)"
+
+            cur = mysql.connection.cursor()
+            cur.execute(query1, (customerFirstName, customerLastName, employeeFirstName, employeeLastName))
+            cur.execute(query2, (productID, transactionID))
+            mysql.connection.commit()
+
+            # redirect back to people page after we execute the update query
+            return redirect("/transactions")
+
 
 @app.errorhandler(404)
 def page_not_found(e):
