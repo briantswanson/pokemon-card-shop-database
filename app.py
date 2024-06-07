@@ -267,7 +267,12 @@ def products():
 
     if request.method == "GET":
         # mySQL query to grab all the people in Products
-        query = "SELECT productID, price, inStock, type, name, Products.productDetailsID FROM Products JOIN ProductDetails ON Products.productDetailsID = ProductDetails.productDetailsID"
+        query = """
+        SELECT productID, price, inStock, type, name, Products.productDetailsID 
+        FROM Products 
+        JOIN ProductDetails 
+        ON Products.productDetailsID = ProductDetails.productDetailsID
+        """
         cur = mysql.connection.cursor()
         cur.execute(query)
         data = cur.fetchall()
@@ -315,14 +320,6 @@ def edit_products(productID):
             name = request.form["name"]
             productDetailsID = request.form["productDetailsID"]
 
-
-            #     # mySQL query to update the attributes of product with our passed productID value
-            # query = "UPDATE Products SET Products.firstName = %s, Products.lastName = %s, Products.email = %s, Products.phone = %s, Products.wage = NULL WHERE Products.productID = %s"
-            # cur = mysql.connection.cursor()
-            # cur.execute(query, (firstName, lastName, productID))
-            # mysql.connection.commit()
-
-
             ####  PRODUCTDETAILS  ####
             query = """
             UPDATE ProductDetails
@@ -343,7 +340,7 @@ def edit_products(productID):
             cur.execute(query, (price, inStock, productID))
             mysql.connection.commit()
 
-            # redirect back to people page after we execute the update query
+            # redirect back to product page after we execute the update query
             return redirect("/products")
 
 # Transactions
@@ -377,14 +374,72 @@ def transactions():
 
     if request.method == "GET":
         # mySQL query to grab all transactions
-        query = """SELECT transactionID, customerID, employeeID, productID, name, price FROM Transactions
-                INNER JOIN Transactions_has_Products
-                ON Transactions.transactionID = Transactions_has_Products.transactionID
-                INNER JOIN Products
-                ON Transactions_has_Products.productID = Products.productID;"""
-        cur = mysql.connection.cursor()
-        cur.execute(query)
-        data = cur.fetchall()
+        query_trans = """
+        SELECT Transactions.transactionID, 
+            Transactions.customerID, 
+            CONCAT(Customers.firstName, " ", Customers.lastName) AS Customer, 
+            Transactions.employeeID, 
+            CONCAT(Employees.firstName, " ", Employees.lastName) AS Employee, 
+            Transactions.transactionDate,
+            Transactions.transactionTime, 
+            Products.productID, 
+            price, 
+            ProductDetails.productDetailsID, 
+            type, 
+            name 
+        FROM Transactions
+        INNER JOIN Transactions_has_Products
+        ON Transactions.transactionID = Transactions_has_Products.transactionID
+        INNER JOIN Products
+        ON Transactions_has_Products.productID = Products.productID
+        JOIN ProductDetails 
+        ON Products.productDetailsID = ProductDetails.productDetailsID
+        JOIN Customers
+        ON Transactions.customerID = Customers.customerID
+        JOIN Employees
+        ON Transactions.employeeID = Employees.employeeID
+        ;"""
+        cur_trans = mysql.connection.cursor()
+        cur_trans.execute(query_trans)
+        data_trans = cur_trans.fetchall()
+        
+        # mySQL query to grab all customers for dynamic drop down
+        query_cust = """
+        SELECT customerID, firstName, lastName 
+        FROM Customers
+        ;"""
+        cur_cust = mysql.connection.cursor()
+        cur_cust.execute(query_cust)
+        data_cust = cur_cust.fetchall()
+        
+        # mySQL query to grab all Employees for dynamic drop down
+        query_emp = """
+        SELECT employeeID, firstName, lastName 
+        FROM Employees
+        ;"""
+        cur_emp = mysql.connection.cursor()
+        cur_emp.execute(query_emp)
+        data_emp = cur_emp.fetchall()
+        
+        # mySQL query to grab all Products for dynamic drop down
+        query_prod = """
+        SELECT * 
+        FROM Products
+        JOIN ProductDetails 
+        ON Products.productDetailsID = ProductDetails.productDetailsID
+        ;"""
+        cur_prod = mysql.connection.cursor()
+        cur_prod.execute(query_prod)
+        data_prod = cur_prod.fetchall()
+
+        
+        data = {}
+        data["transactions"] = data_trans
+        data["customers"] = data_cust
+        data["employees"] = data_emp
+        data["products"] = data_prod
+        
+        print(data["products"])
 
     return render_template("transactions.html", data=data, header="Transactions", id_type="transactionID")
 

@@ -22,20 +22,20 @@
                     <!-- We can preset form inputs to match attributes currently stored for 'customerID' of Customer to be updated via value= and accessing our passed data tuple -->
                     <!-- Create hidden form input to store the passed 'customerID' of the Customer we are editing so we can access it easily in our 'POST' method in our app.py -->
                     <input type="hidden" value="{{data[0].customerID}}" class="form-control" id="customerID" name="customerID" required>
-                    <label for="make">first name:</label>
-
+                    
+                    <label for="firstName">first name:</label>
                     <input type="text" value="{{data[0].firstName}}" class="form-control" id="firstName" name="firstName" pattern="[A-Za-z]{1,}" required>
-                    <label for="model">last name:</label>
-
+                    
+                    <label for="lastName">last name:</label>
                     <input type="text" value="{{data[0].lastName}}" class="form-control" id="lastName" name="lastName" pattern="[A-Za-z0-9]{1,}" required>
-                    <label for="year">email:</label>
-
+                    
+                    <label for="email">email:</label>
                     <input type="email" value="{{data[0].email}}" class="form-control" id="email" name="email" pattern="[^ @]+@[^ @]+.[a-z]+" required>
-                    <label for="color">phone:</label>
-
-                    <input type="text" value="{{data[0].phone}}" class="form-control" id="phone" name="phone" pattern="[A-Za-z0-9]{1,}"> 
-                    <label for="color">address:</label>
-
+                    
+                    <label for="phone">phone:</label>
+                    <input type="text" value="{{data[0].phone}}" class="form-control" id="phone" name="phone" pattern="^(\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$" placeholder="555-555-5555"> 
+                    
+                    <label for="address">address:</label>
                     <input type="text" value="{{data[0].address}}" class="form-control" id="address" name="address"> 
 
                 

@@ -1,0 +1,85 @@
+<!-- # Citation for the following code:
+# Date: 05/19/2024
+# Copied from: CS 340 Flask Guide
+# Source URL: https://github.com/osu-cs340-ecampus/flask-starter-app -->
+    
+{% extends "base.html" %}
+
+{% block header %} Transactions {% endblock %}
+
+        {% block content %}
+
+        <div id="browse">
+            {% with data=data["transactions"] %}
+                {% include "table.html" %}
+            {% endwith %}
+        <p>&nbsp;</p>
+        </div>	<!-- browse -->
+        
+         <div id="insert">
+            <!-- form to INSERT new data into product-->
+            <form id="insertTransaction" action="/transactions" method="post">
+                <legend><strong>Record Transaction</strong></legend>
+                <fieldset>
+                    <!-- placeholder shows ghost text, required forces an input, pattern forces input adherence -->
+
+                    <!--     Dynamically Generate Customers Dropdown     -->
+                    <p>Choose an existing customer or create new on Customer page</p>
+                    <label for="selectCustomer">Select Customer</label>
+                    <select id="selectCustomer">
+                    {% with data=data["customers"] %}    
+                    {% for item in data %}
+
+                    <!-- Create a <option> element with the value of that key in it -->
+                    <option value="{{item["customerID"]}}">{{item["firstName"]}} {{item["lastName"]}}</option>
+                
+                    <!-- End of this for loop -->
+                    {% endfor %}
+                    {% endwith %}
+                    </select>
+
+
+                    <!--     Dynamically Generate Employees Dropdown     -->
+                    <p>Choose an existing employee or create new on Employee page</p>
+                    <label for="selectEmployee">Select Employee</label>
+                    <select id="selectEmployee">
+                    {% with data=data["employees"] %}
+                    {% for item in data %}
+
+                    <!-- Create a <option> element with the value of that key in it -->
+                    <option value="{{item["employeeID"]}}">{{item["firstName"]}} {{item["lastName"]}}</option>
+                
+                    <!-- End of this for loop -->
+                    {% endfor %}
+                    {% endwith %}
+                    </select>
+
+                    <!--     Dynamically Generate Products Dropdown     -->
+                    <p>Choose an existing employee or create new on Product page</p>
+                    <label for="selectProduct">Select Product</label>
+                    <select id="selectProduct">
+                    {% with data=data["products"] %}
+                    {% for item in data %}
+
+                    <!-- Create a <option> element with the value of that key in it -->
+                    <option value="{{item["productID"]}}">{{item["name"]}}</option>
+                
+                    <!-- End of this for loop -->
+                    {% endfor %}
+                    {% endwith %}
+                    </select>
+
+                    <label for="type">product type:</label>
+                    <input type="text" class="form-control" id="type" name="type" pattern="[A-Za-z]{1,}" placeholder="card, snack, apparel" required>
+
+
+
+                </fieldset>
+
+                <!-- Create 'Add Product' and 'Cancel' buttons -->
+                <input type="submit" value="Add Transaction" name="Add_Transaction" class="btn btn-primary" style="margin:.5rem;">
+                <button type="submit" id="cancel" href="/transactions">Cancel</button> 
+            </form>
+        </div><!--insert-->
+
+        {% endblock %}
