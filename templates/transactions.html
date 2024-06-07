@@ -2,12 +2,18 @@
 # Date: 05/19/2024
 # Copied from: CS 340 Flask Guide
 # Source URL: https://github.com/osu-cs340-ecampus/flask-starter-app -->
-    
+
 {% extends "base.html" %}
 
 {% block header %} Transactions {% endblock %}
 
         {% block content %}
+
+
+        <script>
+            var productData = {{ data["products"] | tojson | safe }};
+        </script>
+        <!-- <input type="hidden"  id="productData" value=productData> -->
 
         <div id="browse">
             {% with data=data["transactions"] %}
@@ -21,58 +27,85 @@
             <form id="insertTransaction" action="/transactions" method="post">
                 <legend><strong>Record Transaction</strong></legend>
                 <fieldset>
-                    <!-- placeholder shows ghost text, required forces an input, pattern forces input adherence -->
+                    <!-- Set the Date and Time -->
+                    <h3>Date & Time</h3>
+                    <p> Select the Date and Time of the transaction. Leave blank for "now". </p>
+                    <!-- date-->
+                    <label for="transactionDate">Purchase Date</label>
+                    <input type="date" id="transactionDate" name="transactionDate" />
 
-                    <!--     Dynamically Generate Customers Dropdown     -->
-                    <p>Choose an existing customer or create new on Customer page</p>
+                    <!-- time -->
+                    <label for="transactionTime">Time of Purchase</label>
+                    <input type="time" id="transactionTime" name="transactionTime" />
+                    
+                    <h3>Customer</h3>
+                    <p>Choose an existing customer or create a new entry on <a href="/customers">Customers page.</a></p>
                     <label for="selectCustomer">Select Customer</label>
                     <select id="selectCustomer">
-                    {% with data=data["customers"] %}    
-                    {% for item in data %}
-
-                    <!-- Create a <option> element with the value of that key in it -->
-                    <option value="{{item["customerID"]}}">{{item["firstName"]}} {{item["lastName"]}}</option>
-                
-                    <!-- End of this for loop -->
-                    {% endfor %}
-                    {% endwith %}
+                    <!--     Dynamically Generate Customers Dropdown     -->
+                        {% with data=data["customers"] %}    
+                            {% for item in data %}
+                                <!-- Create a <option> element with the value of that key as its ID -->
+                                <option value="{{item["customerID"]}}">{{item["firstName"]}} {{item["lastName"]}}</option>
+                        
+                            <!-- End of this for loop -->
+                            {% endfor %}
+                        {% endwith %}
                     </select>
 
 
-                    <!--     Dynamically Generate Employees Dropdown     -->
-                    <p>Choose an existing employee or create new on Employee page</p>
+                    <h3>Employee</h3>
+                    <p>Select the Employee who facilitated the transaction. Choose an existing employee or create a new entry on <a href="/employees">Employee page.</a></p>
                     <label for="selectEmployee">Select Employee</label>
                     <select id="selectEmployee">
-                    {% with data=data["employees"] %}
-                    {% for item in data %}
-
-                    <!-- Create a <option> element with the value of that key in it -->
-                    <option value="{{item["employeeID"]}}">{{item["firstName"]}} {{item["lastName"]}}</option>
-                
-                    <!-- End of this for loop -->
-                    {% endfor %}
-                    {% endwith %}
+                    <!--     Dynamically Generate Employees Dropdown     -->
+                        {% with data=data["employees"] %}
+                            {% for item in data %}
+                                <!-- Create a <option> element with the value of that key in it -->
+                                <option value="{{item["employeeID"]}}">{{item["firstName"]}} {{item["lastName"]}}</option>
+                            
+                                <!-- End of this for loop -->
+                            {% endfor %}
+                        {% endwith %}
                     </select>
 
-                    <!--     Dynamically Generate Products Dropdown     -->
-                    <p>Choose an existing employee or create new on Product page</p>
+
+                    <h3>Products</h3>
+                    <p>Choose an existing product or create a new entry on <a href="/products">Products page.</a></p>
                     <label for="selectProduct">Select Product</label>
+                    <p id="productPlaceholder">
                     <select id="selectProduct">
-                    {% with data=data["products"] %}
-                    {% for item in data %}
-
-                    <!-- Create a <option> element with the value of that key in it -->
-                    <option value="{{item["productID"]}}">{{item["name"]}}</option>
-                
-                    <!-- End of this for loop -->
-                    {% endfor %}
-                    {% endwith %}
+                    <!--     Dynamically Generate Products Dropdown     -->
+                        {% with data=data["products"] %}
+                            {% for item in data %}
+                                <!-- Create a <option> element with the value of that key in it -->
+                                <option value="{{item["productID"]}}">{{item["name"]}}</option>
+                            
+                                <!-- End of this for loop -->
+                            {% endfor %}
+                        {% endwith %}
                     </select>
+                    </p>
 
-                    <label for="type">product type:</label>
-                    <input type="text" class="form-control" id="type" name="type" pattern="[A-Za-z]{1,}" placeholder="card, snack, apparel" required>
-
-
+                    <!-- choose another product -->
+                    <input type="button" onclick="addProduct()" value="Add Another Product" />
+    
+                    <script>
+                        function addProduct(){
+                            var productPlaceholder = document.getElementById('productPlaceholder');
+                
+                            var newDropdown = document.createElement('select');
+                            productData.forEach(function(item) {
+                                var option = document.createElement('option');
+                                option.value = item.productID;
+                                option.text = item.name;
+                                newDropdown.appendChild(option);
+                            });
+                
+                            productPlaceholder.appendChild(document.createElement('p')).innerText = "Choose a product.";
+                            productPlaceholder.appendChild(newDropdown);
+                        }
+                    </script>
 
                 </fieldset>
 
