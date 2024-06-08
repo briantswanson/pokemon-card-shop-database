@@ -537,10 +537,10 @@ def edit_transactions(transactionID):
         data_prod = cur_prod.fetchall()
 
         data = {}
-        data["transactions"] = data_trans
-        data["customers"] = data_cust
-        data["employees"] = data_emp
-        data["products"] = data_prod
+        data["transactions"] = convert_for_json(data_trans)
+        data["customers"] = convert_for_json(data_cust)
+        data["employees"] = convert_for_json(data_emp)
+        data["products"] = convert_for_json(data_prod) 
 
 
         return render_template("edit_transactions.html", data=data, header="Transactions", id_type="transactionID")

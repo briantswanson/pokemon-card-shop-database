@@ -10,6 +10,7 @@
         {% block content %}
 
         <script>
+            var transactionData = {{ data["transactions"] | tojson | safe }};
             var customerData = {{ data["customers"] | tojson | safe }};
             var employeeData = {{ data["employees"] | tojson | safe }};
             var productData = {{ data["products"] | tojson | safe }};
@@ -25,12 +26,12 @@
 
                 <div id="edit">
                     <!-- form to edit data in Transactions-->
-                    <form id="editTransaction" action="/edit_transactions/data["transactions"]" method="post">
+                    <form id="editTransaction" action="/edit_transactions/data["transactions"][0]" method="post">
                         <legend>Update Fields:</legend>
                         <fieldset>
                             <!-- We can preset form inputs to match attributes currently stored for 'transactionID' of Employee to be updated via value= and accessing our passed data tuple -->
                             <!-- Create hidden form input to store the passed 'transactionID' of the Employee we are editing so we can access it easily in our 'POST' method in our app.py -->
-                            <input type="hidden" value="data["transactions"]" class="form-control" id="transactionID" name="transactionID" required>
+                            <input type="hidden" value="data["transactions"][0]" class="form-control" id="transactionID" name="transactionID" required>
                             
                             <label for="selectCustomer">Select Customer</label>
                             <select id="selectCustomer">
@@ -52,7 +53,7 @@
                                     {% for item in data %}
                                         <!-- Create a <option> element with the value of that key as its ID -->
                                         <option value="{{dict["employees"]}}">{{item["firstName"]}} {{item["lastName"]}}</option>
-                                
+                        
                                     <!-- End of this for loop -->
                                     {% endfor %}
                                 {% endwith %}
@@ -61,20 +62,25 @@
                             <label for="selectProduct">Select Product</label>
                             <p id="productPlaceholder">
                             <select id="selectProduct">
-                            <!--     Dynamically Generate Product Dropdown     -->
-                                {% with data=data["products"] %}    
-                                    {% for item in data %}
-                                        <!-- Create a <option> element with the value of that key as its ID -->
-                                        <option value="{{dict["products"]}}">{{item["name"]}}</option>
-                                
-                                    <!-- End of this for loop -->
+                                <!-- Create a For-Loop for each Product associated with this transactionID -->
+                                {% with transactions=data["transactions"] %}
+                                    {% for item in transactions %}
+                                        <!--     Dynamically Generate Product Dropdown     -->
+                                        {% with data=data["products"] %}  
+                                            {% for item in data %}
+                                                <!-- Create a <option> element with the value of that key as its ID -->
+                                                <option value="{{dict["products"]}}">{{item["name"]}}</option>
+                                                <!-- End of this for loop -->
+                                            {% endfor %}
+                                        {% endwith %}
+                                    <!-- End of transaction For-Loop -->
                                     {% endfor %}
                                 {% endwith %}
                             </select>
                             </p>
 
                             <!-- For-Loop to show all products on a transaction -->
-                            <!-- <script>
+                            <script>
                                 function showProducts(){
                                     var productPlaceholder = document.getElementById('productPlaceholder');
 
@@ -82,7 +88,7 @@
                                 }
 
 
-                            </script> -->
+                            </script>
 
                             <p> Select the Date and Time of the transaction. Leave blank for "now". </p>
                             <!-- date-->
