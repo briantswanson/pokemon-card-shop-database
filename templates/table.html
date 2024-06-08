@@ -32,10 +32,10 @@
                     <td id="edit"><a href="edit_{{ header|lower }}/{{item[id_type]}}" class="visible">Edit</a></td>
                     <td id="delete"><a href="delete_{{ header|lower }}/{{item[id_type]}}" class="visible">Delete</a></td>
                 </tr> 
-                {% endfor %} 
+                {% endfor %}  
 
         {% else %}
-        <button id="'add_new'">Add New</button>
-        {% endif %} 
+        <button id="add_new">Add New</button>
+        {% endif %}
 </table>
 {% endblock %}

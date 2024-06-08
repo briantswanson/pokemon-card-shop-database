@@ -26,7 +26,7 @@
 
                 <div id="edit">
                     <!-- form to edit data in Transactions-->
-                    <form id="editTransaction" action="/edit_transactions/" method="post">
+                    <form id="editTransaction" action=`/edit_transactions/${transactionData}[0]` method="post">
                         <legend>Update Fields:</legend>
                         <fieldset>
                             <!-- We can preset form inputs to match attributes currently stored for 'transactionID' of Employee to be updated via value= and accessing our passed data tuple -->
