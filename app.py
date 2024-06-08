@@ -360,8 +360,8 @@ def transactions():
 
             # mySQL query to insert a new transaction into Transactions and Transactions_has_Products
             query1 = """INSERT INTO Transactions (customerID, employeeID)
-                        VALUES ((SELECT customerID FROM Customers WHERE firstName = %s AND lastName = %s),
-                        (SELECT employeeID FROM Employees WHERE firstName = %s AND lastName = %s)"""
+                        VALUES ((SELECT customerID FROM Customers WHERE Customers.firstName = %s AND Customers.lastName = %s),
+                        (SELECT employeeID FROM Employees WHERE Employees.firstName = %s AND Employees.lastName = %s)"""
             
             query2 = "INSERT INTO Transactions_has_Products (transactionID, productID) VALUES (%s, %s)"
             cur = mysql.connection.cursor()
@@ -444,7 +444,7 @@ def transactions():
     return render_template("transactions.html", data=data, header="Transactions", id_type="transactionID")
 
 @app.route("/delete_transactions/<int:transactionID>")
-def delete_transactionss(transactionID):
+def delete_transactions(transactionID, productDetailsID):
     # mySQL query to delete the transaction with our passed transactionID
     query = "DELETE FROM Transactions WHERE transactionID = '%s';"
     cur = mysql.connection.cursor()
@@ -458,26 +458,88 @@ def delete_transactionss(transactionID):
 def edit_transactions(transactionID):
     if request.method == "GET":
         # mySQL query to grab the info of the transactions with our passed transactionID
-        query = "SELECT * FROM Transactions WHERE transactionID = %s" % (transactionID)
+        query = """
+        SELECT Transactions.transactionID, 
+            Transactions.customerID, 
+            CONCAT(Customers.firstName, " ", Customers.lastName) AS Customer, 
+            Transactions.employeeID, 
+            CONCAT(Employees.firstName, " ", Employees.lastName) AS Employee, 
+            Transactions.transactionDate,
+            Transactions.transactionTime, 
+            Products.productID, 
+            price, 
+            ProductDetails.productDetailsID, 
+            type, 
+            name 
+        FROM Transactions
+        INNER JOIN Transactions_has_Products
+        ON Transactions.transactionID = Transactions_has_Products.transactionID
+        INNER JOIN Products
+        ON Transactions_has_Products.productID = Products.productID
+        JOIN ProductDetails 
+        ON Products.productDetailsID = ProductDetails.productDetailsID
+        JOIN Customers
+        ON Transactions.customerID = Customers.customerID
+        JOIN Employees
+        ON Transactions.employeeID = Employees.employeeID
+        WHERE Transactions.transactionID = '%s'
+        ;"""
         cur = mysql.connection.cursor()
-        cur.execute(query)
-        data = cur.fetchall()
+        cur.execute(query, (transactionID,))
+        data_trans = cur.fetchall()
 
-        return render_template("edit_transactions.html", data=data, header="Transactions")
+        # mySQL query to grab all customers for dynamic drop down
+        query_cust = """
+        SELECT customerID, firstName, lastName 
+        FROM Customers
+        ;"""
+        cur_cust = mysql.connection.cursor()
+        cur_cust.execute(query_cust)
+        data_cust = cur_cust.fetchall()
+
+        # mySQL query to grab all Employees for dynamic drop down
+        query_emp = """
+        SELECT employeeID, firstName, lastName 
+        FROM Employees
+        ;"""
+        cur_emp = mysql.connection.cursor()
+        cur_emp.execute(query_emp)
+        data_emp = cur_emp.fetchall()
+
+        # mySQL query to grab all Products for dynamic drop down
+        query_prod = """
+        SELECT * 
+        FROM Products
+        JOIN ProductDetails 
+        ON Products.productDetailsID = ProductDetails.productDetailsID
+        ;"""
+        cur_prod = mysql.connection.cursor()
+        cur_prod.execute(query_prod)
+        data_prod = cur_prod.fetchall()
+
+        data = {}
+        data["transactions"] = data_trans
+        data["customers"] = data_cust
+        data["employees"] = data_emp
+        data["products"] = data_prod
+
+
+        return render_template("edit_transactions.html", data=data, header="Transactions", id_type="transactionID")
     
     if request.method == "POST":
         # fire off if user clicks the 'Edit Transaction' button
         if request.form.get("Edit_Transaction"):
             # grab user form inputs
-            customerFirstName = request.form["customerFirstName"]
-            customerLastName = request.form["customerLastName"]
-            employeeFirstName = request.form["employeeFirstName"]
-            employeeLastName = request.form["employeeLastName"]
+            # customerFirstName = request.form["customerFirstName"]
+            # customerLastName = request.form["customerLastName"]
+            # employeeFirstName = request.form["employeeFirstName"]
+            # employeeLastName = request.form["employeeLastName"]
+            customerID = request.form["customerID"]
+            employeeID = request.form["employeeID"]
             productID = request.form["productID"]
             transactionID = request.form["transactionID"]
 
-            query1 = """UPDATE Transactions SET Transactions.customerID = (SELECT customerID FROM Customers WHERE firstName = %s AND lastName = %s),
-                        Transactions.employeeID = (SELECT employeeID FROM Employees WHERE firstName = %s AND lastName = %s)"""
+            query1 = """UPDATE Transactions SET (Transactions.customerID,Transactions.employeeID) VALUES (%s, %s)"""
             
             query2 = "UPDATE Transactions_has_Products SET (transactionID, productID) VALUES (%s, %s)"
 

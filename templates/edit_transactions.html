@@ -1,0 +1,102 @@
+<!-- # Citation for the following code:
+# Date: 05/19/2024
+# Copied from: CS 340 Flask Guide
+# Source URL: https://github.com/osu-cs340-ecampus/flask-starter-app -->
+
+{% extends "base.html" %}
+
+{% block header %} Transactions {% endblock %}
+
+        {% block content %}
+
+        <script>
+            var customerData = {{ data["customers"] | tojson | safe }};
+            var employeeData = {{ data["employees"] | tojson | safe }};
+            var productData = {{ data["products"] | tojson | safe }};
+        </script>
+        <!-- <input type="hidden"  id="productData" value=productData> -->
+
+        <div id="browse">
+            {% with data=data["transactions"] %}
+                {% include "edit_table.html" %}
+            {% endwith %}
+        <p>&nbsp;</p>
+        </div>	<!-- browse -->
+
+                <div id="edit">
+                    <!-- form to edit data in Transactions-->
+                    <form id="editTransaction" action="/edit_transactions/data["transactions"]" method="post">
+                        <legend>Update Fields:</legend>
+                        <fieldset>
+                            <!-- We can preset form inputs to match attributes currently stored for 'transactionID' of Employee to be updated via value= and accessing our passed data tuple -->
+                            <!-- Create hidden form input to store the passed 'transactionID' of the Employee we are editing so we can access it easily in our 'POST' method in our app.py -->
+                            <input type="hidden" value="data["transactions"]" class="form-control" id="transactionID" name="transactionID" required>
+                            
+                            <label for="selectCustomer">Select Customer</label>
+                            <select id="selectCustomer">
+                            <!--     Dynamically Generate Customers Dropdown     -->
+                                {% with data=data["customers"] %}    
+                                    {% for item in data %}
+                                        <!-- Create a <option> element with the value of that key as its ID -->
+                                        <option value="{{dict["customers"]}}">{{item["firstName"]}} {{item["lastName"]}}</option>
+                                
+                                    <!-- End of this for loop -->
+                                    {% endfor %}
+                                {% endwith %}
+                            </select>
+
+                            <label for="selectEmployee">Select Employee</label>
+                            <select id="selectEmployee">
+                            <!--     Dynamically Generate Employee Dropdown     -->
+                                {% with data=data["employees"] %}    
+                                    {% for item in data %}
+                                        <!-- Create a <option> element with the value of that key as its ID -->
+                                        <option value="{{dict["employees"]}}">{{item["firstName"]}} {{item["lastName"]}}</option>
+                                
+                                    <!-- End of this for loop -->
+                                    {% endfor %}
+                                {% endwith %}
+                            </select>
+
+                            <label for="selectProduct">Select Product</label>
+                            <p id="productPlaceholder">
+                            <select id="selectProduct">
+                            <!--     Dynamically Generate Product Dropdown     -->
+                                {% with data=data["products"] %}    
+                                    {% for item in data %}
+                                        <!-- Create a <option> element with the value of that key as its ID -->
+                                        <option value="{{dict["products"]}}">{{item["name"]}}</option>
+                                
+                                    <!-- End of this for loop -->
+                                    {% endfor %}
+                                {% endwith %}
+                            </select>
+                            </p>
+
+                            <!-- For-Loop to show all products on a transaction -->
+                            <!-- <script>
+                                function showProducts(){
+                                    var productPlaceholder = document.getElementById('productPlaceholder');
+
+
+                                }
+
+
+                            </script> -->
+
+                            <p> Select the Date and Time of the transaction. Leave blank for "now". </p>
+                            <!-- date-->
+                            <label for="transactionDate">Purchase Date</label>
+                            <input type="date" id="transactionDate" name="transactionDate" />
+        
+                            <!-- time -->
+                            <label for="transactionTime">Time of Purchase</label>
+                            <input type="time" id="transactionTime" name="transactionTime" />
+
+                        
+                        </fieldset>
+                        <input type="submit" value="Edit Transaction" name="Edit_Transaction" class="btn btn-primary" style="margin:.5rem;">
+                        <a href='/transactions'><input class="btn" type="button" value="cancel"></a>
+                    </form>
+
+{% endblock %}
