@@ -285,12 +285,12 @@ def products():
 @app.route("/delete_products/<int:productID>")
 def delete_products(productID):
     # mySQL query to delete the product with our passed productID
-    query = "DELETE FROM Products WHERE productID = '%s';"
-    query2 = "DELETE FROM ProductDetails WHERE productDetailsID = (SELECT productDetailsID FROM Products WHERE productID = '%s')"
+    query = "DELETE FROM ProductDetails WHERE productDetailsID = (SELECT productDetailsID FROM Products WHERE productID = '%s')"
+    query2 = "DELETE FROM Products WHERE productID = '%s';"
 
     cur = mysql.connection.cursor()
-    cur.execute(query2, (productID,))
     cur.execute(query, (productID,))
+    cur.execute(query2, (productID,))
     mysql.connection.commit()
 
     # redirect back to product page
