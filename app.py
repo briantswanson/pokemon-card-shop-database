@@ -466,11 +466,13 @@ def transactions():
     return render_template("transactions.html", data=data, header="Transactions", id_type="transactionID")
 
 @app.route("/delete_transactions/<int:transactionID>")
-def delete_transactions(transactionID, productDetailsID):
+def delete_transactions(transactionID):
     # mySQL query to delete the transaction with our passed transactionID
-    query = "DELETE FROM Transactions WHERE transactionID = '%s';"
+    query = "DELETE FROM Transactions_has_Products WHERE transactionID = '%s';"
+    query2 = "DELETE FROM Transactions WHERE transactionID = '%s';"
     cur = mysql.connection.cursor()
     cur.execute(query, (transactionID,))
+    cur.execure(query2, (transactionID,))
     mysql.connection.commit()
 
     # redirect back to transactions page

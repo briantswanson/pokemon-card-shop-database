@@ -33,6 +33,9 @@
                     <td id="delete"><a href="delete_{{ header|lower }}/{{item[id_type]}}" class="visible">Delete</a></td>
                 </tr> 
                 {% endfor %} 
+
+        {% else %}
+        <button id="'add_new'">Add New</button>
         {% endif %} 
 </table>
 {% endblock %}
