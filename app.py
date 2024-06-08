@@ -396,14 +396,20 @@ def transactions():
             VALUES 
             """
             
-            product_query = []
-            
-            for productID in product:
-                product_query.append(f"({transactionID}, {productID})")
+            # transaction contains multiple products
+            if len(product) > 1:
+                product_query = []
                 
-            query2.join(product_query, ', ')
+                for productID in product:
+                    product_query.append(f"({transactionID}, {productID})")
+                 
+                query2 += ', '.join(product_query)
         
-            
+            # new transaction contains one product
+            else:
+                productID = product[0]
+                query2 += f"({transactionID}, {productID})"
+                
             cur.execute(query2,)
                 
             mysql.connection.commit()
