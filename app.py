@@ -20,7 +20,6 @@ from flask_mysqldb import MySQL
 from flask import request
 from datetime import date, timedelta
 from decimal import Decimal
-import json
 import os
 
 # Configuration
@@ -373,23 +372,40 @@ def transactions():
     if request.method == "POST":
         # fire off if user presses the Add Person button
         if request.form.get("Add_Transaction"):
-            # grab user form inputs
-            customerFirstName = request.form["customerFirstName"]
-            customerLastName = request.form["customerLastName"]
-            employeeFirstName = request.form["employeeFirstName"]
-            employeeLastName = request.form["employeeLastName"]
-            productID = request.form["productID"]
-            transactionID = request.form["transactionID"]
-
-            # mySQL query to insert a new transaction into Transactions and Transactions_has_Products
-            query1 = """INSERT INTO Transactions (customerID, employeeID)
-                        VALUES ((SELECT customerID FROM Customers WHERE Customers.firstName = %s AND Customers.lastName = %s),
-                        (SELECT employeeID FROM Employees WHERE Employees.firstName = %s AND Employees.lastName = %s)"""
             
-            query2 = "INSERT INTO Transactions_has_Products (transactionID, productID) VALUES (%s, %s)"
+            print(request.form)
+            # grab user form inputs
+            transactionDate = request.form["transactionDate"]
+            transactionTime = request.form["transactionTime"]
+            customerID = request.form["customer"]
+            employeeID = request.form["employee"]
+            product = request.form.getlist("product")
+            
+            # mySQL query to insert a new transaction into Transactions and Transactions_has_Product
+            query1 = """INSERT INTO Transactions (customerID, employeeID, transactionDate, transactionTime)
+                        VALUES (%s, %s, %s, %s)"""
+            
             cur = mysql.connection.cursor()
-            cur.execute(query1, (customerFirstName, customerLastName, employeeFirstName, employeeLastName))
-            cur.execute(query2, (transactionID, productID))
+            cur.execute(query1, (customerID, employeeID, transactionDate, transactionTime))
+            
+            # Get the last inserted transaction ID
+            transactionID = cur.lastrowid
+            
+            query2 = """
+            INSERT INTO Transactions_has_Products (transactionID, productID) 
+            VALUES 
+            """
+            
+            product_query = []
+            
+            for productID in product:
+                product_query.append(f"({transactionID}, {productID})")
+                
+            query2.join(product_query, ', ')
+        
+            
+            cur.execute(query2,)
+                
             mysql.connection.commit()
 
             # redirect back to Transactions page
@@ -554,16 +570,18 @@ def edit_transactions(transactionID):
         # fire off if user clicks the 'Edit Transaction' button
         if request.form.get("Edit_Transaction"):
             # grab user form inputs
-            customerID = request.form["selectCustomer"]
-            employeeID = request.form["selectEmployee"]
-            transactionDate = request.form["transactionDate"]
-            transactionTime = request.form["transactionTime"]
+            # customerFirstName = request.form["customerFirstName"]
+            # customerLastName = request.form["customerLastName"]
+            # employeeFirstName = request.form["employeeFirstName"]
+            # employeeLastName = request.form["employeeLastName"]
+            customerID = request.form["customerID"]
+            employeeID = request.form["employeeID"]
+            productID = request.form["productID"]
+            transactionID = request.form["transactionID"]
 
-            query1 = """
-            UPDATE Transactions
-            SET Transactions.customerID = %s, Transactions.employeeID = %s, Transactions.transactionDate = %s, Transactions.transactionTime = %s
-            WHERE Transactions.transactionID = %s
-            """
+            query1 = """UPDATE Transactions SET (Transactions.customerID,Transactions.employeeID) VALUES (%s, %s)"""
+            
+            query2 = "UPDATE Transactions_has_Products SET (transactionID, productID) VALUES (%s, %s)"
 
             cur = mysql.connection.cursor()
             cur.execute(query1, (customerID, employeeID, transactionDate, transactionTime))
@@ -574,7 +592,7 @@ def edit_transactions(transactionID):
                                 cur.execute(query2, (transactionID,))
             mysql.connection.commit()
 
-            # redirect back to transaction page after we execute the update query
+            # redirect back to people page after we execute the update query
             return redirect("/transactions")
 
 
