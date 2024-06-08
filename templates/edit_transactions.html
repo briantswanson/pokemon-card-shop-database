@@ -26,7 +26,7 @@
 
                 <div id="edit">
                     <!-- form to edit data in Transactions-->
-                    <form id="editTransaction" action="/edit_transactions/data["transactions"][0]" method="post">
+                    <form id="editTransaction" action="/edit_transactions/${transactionData}[0]" method="post">
                         <legend>Update Fields:</legend>
                         <fieldset>
                             <!-- We can preset form inputs to match attributes currently stored for 'transactionID' of Employee to be updated via value= and accessing our passed data tuple -->
@@ -34,7 +34,7 @@
                             <input type="hidden" value="data["transactions"][0]" class="form-control" id="transactionID" name="transactionID" required>
                             
                             <label for="selectCustomer">Select Customer</label>
-                            <select id="selectCustomer">
+                            <select id="selectCustomer" name="selectCustomer">
                             <!--     Dynamically Generate Customers Dropdown     -->
                                 {% with data=data["customers"] %}    
                                     {% for item in data %}
@@ -47,7 +47,7 @@
                             </select>
 
                             <label for="selectEmployee">Select Employee</label>
-                            <select id="selectEmployee">
+                            <select id="selectEmployee" name="selectEmployee">
                             <!--     Dynamically Generate Employee Dropdown     -->
                                 {% with data=data["employees"] %}    
                                     {% for item in data %}
@@ -60,24 +60,26 @@
                             </select>
 
                             <label for="selectProduct">Select Product</label>
-                            <p id="productPlaceholder">
-                            <select id="selectProduct">
-                                <!-- Create a For-Loop for each Product associated with this transactionID -->
-                                {% with transactions=data["transactions"] %}
-                                    {% for item in transactions %}
-                                        <!--     Dynamically Generate Product Dropdown     -->
-                                        {% with data=data["products"] %}  
-                                            {% for item in data %}
-                                                <!-- Create a <option> element with the value of that key as its ID -->
-                                                <option value="{{dict["products"]}}">{{item["name"]}}</option>
-                                                <!-- End of this for loop -->
-                                            {% endfor %}
-                                        {% endwith %}
-                                    <!-- End of transaction For-Loop -->
-                                    {% endfor %}
-                                {% endwith %}
-                            </select>
-                            </p>
+                            {% with transactions=data["transactions"] %}
+                                {% for sale in transactions %}
+                                    <p id="productPlaceholder">
+                                    <select id="selectProduct" name="selectProduct">
+                                        <!-- Create a For-Loop for each Product associated with this transactionID -->
+
+                                                <!--     Dynamically Generate Product Dropdown     -->
+                                                {% with items=data["products"] %}  
+                                                    {% for item in items %}
+                                                        <!-- Create a <option> element with the value of that key as its ID -->
+                                                        <option value="{{dict["products"]}}">{{item["name"]}}</option>
+                                                        <!-- End of this for loop -->
+                                                    {% endfor %}
+                                                {% endwith %}
+                                            <!-- End of transaction For-Loop -->
+
+                                    </select>
+                                    </p>
+                                {% endfor %}
+                            {% endwith %}
 
                             <!-- For-Loop to show all products on a transaction -->
                             <script>

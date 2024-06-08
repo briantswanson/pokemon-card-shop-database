@@ -549,25 +549,27 @@ def edit_transactions(transactionID):
         # fire off if user clicks the 'Edit Transaction' button
         if request.form.get("Edit_Transaction"):
             # grab user form inputs
-            # customerFirstName = request.form["customerFirstName"]
-            # customerLastName = request.form["customerLastName"]
-            # employeeFirstName = request.form["employeeFirstName"]
-            # employeeLastName = request.form["employeeLastName"]
-            customerID = request.form["customerID"]
-            employeeID = request.form["employeeID"]
-            productID = request.form["productID"]
-            transactionID = request.form["transactionID"]
+            customerID = request.form["selectCustomer"]
+            employeeID = request.form["selectEmployee"]
+            transactionDate = request.form["transactionDate"]
+            transactionTime = request.form["transactionTime"]
 
-            query1 = """UPDATE Transactions SET (Transactions.customerID,Transactions.employeeID) VALUES (%s, %s)"""
-            
-            query2 = "UPDATE Transactions_has_Products SET (transactionID, productID) VALUES (%s, %s)"
+            query1 = """
+            UPDATE Transactions
+            SET Transactions.customerID = %s, Transactions.employeeID = %s, Transactions.transactionDate = %s, Transactions.transactionTime = %s
+            WHERE Transactions.transactionID = %s
+            """
 
             cur = mysql.connection.cursor()
-            cur.execute(query1, (customerFirstName, customerLastName, employeeFirstName, employeeLastName))
-            cur.execute(query2, (productID, transactionID))
+            cur.execute(query1, (customerID, employeeID, transactionDate, transactionTime))
+
+            for key,val in request.form.items():
+                if key == "selectProduct":
+                                query2 = "UPDATE Transactions_has_Products SET productID = %s WHERE Transactions_has_Products.transactionID =" + str(val)
+                                cur.execute(query2, (transactionID))
             mysql.connection.commit()
 
-            # redirect back to people page after we execute the update query
+            # redirect back to transaction page after we execute the update query
             return redirect("/transactions")
 
 
