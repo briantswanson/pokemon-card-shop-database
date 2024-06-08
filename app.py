@@ -571,7 +571,7 @@ def edit_transactions(transactionID):
             for key,val in request.form.items():
                 if key == "selectProduct":
                                 query2 = "UPDATE Transactions_has_Products SET productID = %s WHERE Transactions_has_Products.transactionID =" + str(val)
-                                cur.execute(query2, (transactionID))
+                                cur.execute(query2, (transactionID,))
             mysql.connection.commit()
 
             # redirect back to transaction page after we execute the update query
