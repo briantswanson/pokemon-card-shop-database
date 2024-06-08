@@ -1,3 +1,3 @@
 # pokemon-card-shop-database
 
-flask --app main.py --debug run
+flask --app app.py --debug run

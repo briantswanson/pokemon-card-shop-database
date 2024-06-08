@@ -24,6 +24,29 @@ function browse() {
     showform('browse');
 }
 
+// function today() {
+//     document.getElementById('transactionDate').valueAsDate = new Date();
+//     document.getElementById('transactionTime')
+// }
+
+// function addProduct(){
+//     productPlaceholder = document.getElementById('productPlaceholder')
+
+//     productPlaceholder.value += `
+//     <p>Select another product.</p>
+//     <select>
+//         {% for item in data %}
+//             <!-- Create a <option> element with the value of that key in it -->
+//             <option value="{{item["productID"]}}">{{item["name"]}}</option>
+        
+//             <!-- End of this for loop -->
+//         {% endfor %}
+//     {% endwith %}
+//     </select>`
+
+// console.log("Adding Product")
+// }
+
 
 // LISTEN to the events
 document.addEventListener('DOMContentLoaded', () => {
@@ -35,5 +58,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const cancelButton = document.getElementById('cancel');
     cancelButton.addEventListener('click', browse);
+
+    // if (document.getElementById('addProduct')){
+    //     const addProductButton = document.getElementById('addProduct');
+    //     addProductButton.addEventListener('click', addProduct);
+    // }
 
 });

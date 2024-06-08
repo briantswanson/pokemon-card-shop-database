@@ -18,6 +18,9 @@ Questions:
 from flask import Flask, render_template, json, redirect
 from flask_mysqldb import MySQL
 from flask import request
+from datetime import date, timedelta
+from decimal import Decimal
+import json
 import os
 
 # Configuration
@@ -343,6 +346,23 @@ def edit_products(productID):
             # redirect back to product page after we execute the update query
             return redirect("/products")
 
+
+# CITATION: 
+# This method was adapted for use from ChatGPT in order to solve a rendering issue with Jinja
+def convert_for_json(data):
+    if isinstance(data, dict):
+        return {k: convert_for_json(v) for k, v in data.items()}
+    elif isinstance(data, list) or isinstance(data, tuple):
+        return [convert_for_json(v) for v in data]
+    elif isinstance(data, date):
+        return data.isoformat()  # Convert to string
+    elif isinstance(data, timedelta):
+        return str(data)  # Convert to string
+    elif isinstance(data, Decimal):
+        return float(data)  # Convert to float
+    return data
+
+
 # Transactions
 @app.route('/transactions', methods=["POST","GET"])
 def transactions():
@@ -373,6 +393,7 @@ def transactions():
             return redirect("/transactions")
 
     if request.method == "GET":
+        data = {}
         # mySQL query to grab all transactions
         query_trans = """
         SELECT Transactions.transactionID, 
@@ -433,13 +454,11 @@ def transactions():
         data_prod = cur_prod.fetchall()
 
         
-        data = {}
-        data["transactions"] = data_trans
-        data["customers"] = data_cust
-        data["employees"] = data_emp
-        data["products"] = data_prod
-        
-        print(data["products"])
+    
+        data["transactions"] = convert_for_json(data_trans)
+        data["customers"] = convert_for_json(data_cust)
+        data["employees"] = convert_for_json(data_emp)
+        data["products"] = convert_for_json(data_prod)       
 
     return render_template("transactions.html", data=data, header="Transactions", id_type="transactionID")
 
