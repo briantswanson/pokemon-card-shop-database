@@ -373,6 +373,8 @@ def transactions():
     if request.method == "POST":
         # fire off if user presses the Add Person button
         if request.form.get("Add_Transaction"):
+            
+            print(request.form)
             # grab user form inputs
             customerFirstName = request.form["customerFirstName"]
             customerLastName = request.form["customerLastName"]

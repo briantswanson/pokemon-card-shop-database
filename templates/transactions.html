@@ -28,7 +28,7 @@
                 <legend><strong>Record Transaction</strong></legend>
                 <fieldset>
                     <!-- Set the Date and Time -->
-                    <h3>Date & Time</h3>
+                    <h3>Date &amp; Time</h3>
                     <p> Select the Date and Time of the transaction. Leave blank for "now". </p>
                     <!-- date-->
                     <label for="transactionDate">Purchase Date</label>
@@ -41,7 +41,7 @@
                     <h3>Customer</h3>
                     <p>Choose an existing customer or create a new entry on <a href="/customers">Customers page.</a></p>
                     <label for="selectCustomer">Select Customer</label>
-                    <select id="selectCustomer">
+                    <select id="selectCustomer" name="customer">
                     <!--     Dynamically Generate Customers Dropdown     -->
                         {% with data=data["customers"] %}    
                             {% for item in data %}
@@ -57,7 +57,7 @@
                     <h3>Employee</h3>
                     <p>Select the Employee who facilitated the transaction. Choose an existing employee or create a new entry on <a href="/employees">Employee page.</a></p>
                     <label for="selectEmployee">Select Employee</label>
-                    <select id="selectEmployee">
+                    <select id="selectEmployee" name="employee">
                     <!--     Dynamically Generate Employees Dropdown     -->
                         {% with data=data["employees"] %}
                             {% for item in data %}
@@ -74,7 +74,7 @@
                     <p>Choose an existing product or create a new entry on <a href="/products">Products page.</a></p>
                     <label for="selectProduct">Select Product</label>
                     <p id="productPlaceholder">
-                    <select id="selectProduct">
+                    <select id="selectProduct" name="product">
                     <!--     Dynamically Generate Products Dropdown     -->
                         {% with data=data["products"] %}
                             {% for item in data %}
@@ -93,25 +93,35 @@
                     <script>
                         function addProduct(){
                             var productPlaceholder = document.getElementById('productPlaceholder');
-                
+                            let counter = 1
                             var newDropdown = document.createElement('select');
+                            newDropdown.setAttribute('name', 'addedProducts');
                             productData.forEach(function(item) {
                                 var option = document.createElement('option');
                                 option.value = item.productID;
                                 option.text = item.name;
                                 newDropdown.appendChild(option);
                             });
-                
-                            productPlaceholder.appendChild(document.createElement('p')).innerText = "Choose a product.";
-                            productPlaceholder.appendChild(newDropdown);
+                            const newP = document.createElement('p');
+                            newP.setAttribute('id', counter);
+                            productPlaceholder.appendChild(newP).innerText = "Choose a product: ";
+                            newP.appendChild(newDropdown);
+                            newP.innerHTML += `<input type="button" value="Remove" onclick=removeAddedProduct(${counter}) />`
+                            counter += 1;
+                        }
+
+                        function removeAddedProduct(id){
+                            const parent = document.getElementById('productPlaceholder');
+                            const child = document.getElementById(id);
+                            parent.removeChild(child);
                         }
                     </script>
 
                 </fieldset>
 
                 <!-- Create 'Add Product' and 'Cancel' buttons -->
-                <input type="submit" value="Add Transaction" name="Add_Transaction" class="btn btn-primary" style="margin:.5rem;">
-                <button type="submit" id="cancel" href="/transactions">Cancel</button> 
+                <input type="submit" value="Add Transaction" name="Add_Transaction" class="btn btn-primary" style="margin:.5rem;" />
+                <input type="button" id="cancel" href="/transactions" value="Cancel"/>
             </form>
         </div><!--insert-->
 
