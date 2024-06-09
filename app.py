@@ -533,6 +533,7 @@ def edit_transactions(transactionID):
         cur = mysql.connection.cursor()
         cur.execute(query, (transactionID,))
         data_trans = cur.fetchall()
+        
 
         # mySQL query to grab all customers for dynamic drop down
         query_cust = """
@@ -569,37 +570,79 @@ def edit_transactions(transactionID):
         data["employees"] = convert_for_json(data_emp)
         data["products"] = convert_for_json(data_prod) 
 
-
         return render_template("edit_transactions.html", data=data, header="Transactions", id_type="transactionID")
     
     if request.method == "POST":
         # fire off if user clicks the 'Edit Transaction' button
         if request.form.get("Edit_Transaction"):
+        
             # grab user form inputs
-            # customerFirstName = request.form["customerFirstName"]
-            # customerLastName = request.form["customerLastName"]
-            # employeeFirstName = request.form["employeeFirstName"]
-            # employeeLastName = request.form["employeeLastName"]
-            customerID = request.form["customerID"]
-            employeeID = request.form["employeeID"]
-            productID = request.form["productID"]
-            transactionID = request.form["transactionID"]
+            print(request.form)
+            customerID = request.form["customer"]
+            employeeID = request.form["employee"]
+            transactionDate = request.form["transactionDate"]
+            transactionTime = request.form["transactionTime"]
 
-            query1 = """UPDATE Transactions SET (Transactions.customerID,Transactions.employeeID) VALUES (%s, %s)"""
+            # TRANSACTION QUERY
+            query1 = """
+            UPDATE Transactions 
+            SET customerID = %s, employeeID = %s, transactionTime = %s, transactionDate = %s
+            WHERE transactionID = %s """
             
-            query2 = "UPDATE Transactions_has_Products SET (transactionID, productID) VALUES (%s, %s)"
-
             cur = mysql.connection.cursor()
-            cur.execute(query1, (customerID, employeeID, transactionDate, transactionTime))
+            cur.execute(query1, (customerID, employeeID, transactionTime, transactionDate, transactionID))
+            
+            
+            # TRANSACTION_HAS_PRODUCTS QUERY
+            productList = request.form.getlist("product")
 
-            for key,val in request.form.items():
-                if key == "selectProduct":
-                                query2 = "UPDATE Transactions_has_Products SET productID = %s WHERE Transactions_has_Products.transactionID =" + str(val)
-                                cur.execute(query2, (transactionID,))
+            
+            # TODO MAKE THIS COMPATIBLE WITH MULTIPLE PRODUCT UPDATES
+            # IDEA: don't allow users to remove any products from EDIT, 
+            # instead must use delete first
+            query2 = """
+            UPDATE Transactions_has_Products 
+            SET productID = %s 
+            """
+            
+            # transaction contains multiple products
+            if len(productList) > 1:
+                product_query = []
+                
+                for productID in productList:
+                    product_query.append(f"({transactionID}, {productID})")
+                 
+                query2 += ', '.join(product_query)
+        
+            # new transaction contains one product
+            else:
+                productID = productList[0]
+                query2 += f"({transactionID}, {productID})"
+            
+            query2 += f"WHERE transactionID = {transactionID}"
+                
+            cur.execute(query2,)
+            
+
+            # for key,val in request.form.items():
+            #     if key == "selectProduct":
+            #                     query2 = "UPDATE Transactions_has_Products SET productID = %s WHERE Transactions_has_Products.transactionID =" + str(val)
+            #                     cur.execute(query2, (transactionID,))
             mysql.connection.commit()
 
             # redirect back to people page after we execute the update query
             return redirect("/transactions")
+            # return(request.form)
+
+
+@app.context_processor
+def utility_functions():
+    def print_in_console(message):
+        print(str(message))
+
+    return dict(mdebug=print_in_console)
+
+
 
 
 @app.errorhandler(404)
