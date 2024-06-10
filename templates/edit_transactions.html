@@ -9,15 +9,12 @@
 
         {% block content %}
 
+
         <script>
-            const data = {{ data | tojson | safe }}
-            var transactionData = {{ data["transactions"] | tojson | safe }};
+
             var customerData = {{ data["customers"] | tojson | safe }};
             var employeeData = {{ data["employees"] | tojson | safe }};
             var productData = {{ data["products"] | tojson | safe }};
-            console.log("transactions:")
-            console.log(data["transactions"])
-            console.log(data["transactions"][0]["transactionTime"])
         </script>
         <!-- <input type="hidden"  id="productData" value=productData> -->
 
@@ -25,7 +22,7 @@
             {% with data=data["transactions"] %}
                 {% include "edit_table.html" %}
             {% endwith %}
-
+            
             {% set customerID = data["transactions"][0]["customerID"] %}
             {% set employeeID = data["transactions"][0]["employeeID"] %}
             {% set productsList = data["products"] %}

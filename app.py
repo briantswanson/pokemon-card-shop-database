@@ -7,18 +7,11 @@
 # Copied from: CS 340 Flask Guide
 # Source URL: https://github.com/osu-cs340-ecampus/flask-starter-app
 
-"""
-Questions:
-1. The credentials don't seem to be working on db_connector... why?
-    Needs to be connecting to classmysql and not classwork
-2. How do we implement smaller app.py files (per the video)
-
-"""
 
 from flask import Flask, render_template, json, redirect
 from flask_mysqldb import MySQL
 from flask import request
-from datetime import date, timedelta
+import datetime
 from decimal import Decimal
 import os
 
@@ -349,6 +342,7 @@ def edit_products(productID):
             return redirect("/products")
 
 
+
 # Transactions
 @app.route('/transactions', methods=["POST","GET"])
 def transactions():
@@ -357,7 +351,6 @@ def transactions():
         # fire off if user presses the Add Person button
         if request.form.get("Add_Transaction"):
             
-            print(request.form)
             # grab user form inputs
             transactionDate = request.form["transactionDate"]
             transactionTime = request.form["transactionTime"]
@@ -484,6 +477,17 @@ def delete_transactions(transactionID):
     # redirect back to transactions page
     return redirect("/transactions")
 
+
+# CITATION:
+# https://stackoverflow.com/questions/764184/how-do-i-get-time-from-a-datetime-timedelta-object
+def convert_timedelta(data):
+    for index in range(len(data)):
+        value = data[index]["transactionTime"]
+        data[index]["transactionTime"] = (datetime.datetime.min + value).time()
+    return data
+        
+        
+
 @app.route("/edit_transactions/<int:transactionID>", methods=["POST", "GET"])
 def edit_transactions(transactionID):
     if request.method == "GET":
@@ -516,8 +520,8 @@ def edit_transactions(transactionID):
         ;"""
         cur = mysql.connection.cursor()
         cur.execute(query, (transactionID,))
-        data_trans = cur.fetchall()
-        
+        raw_data_trans = cur.fetchall()
+        data_trans = convert_timedelta(raw_data_trans)
 
         # mySQL query to grab all customers for dynamic drop down
         query_cust = """
@@ -588,31 +592,25 @@ def edit_transactions(transactionID):
             
             
             data_trans_prod = list(sql_trans_prod)
-            print("data_trans_prod: ", data_trans_prod)
             for productID in productList:
                 # ({'transactions_has_productsID': 2, 'transactionID': 2, 'productID': 29},)
-                print("productID: ", productID)
                 if data_trans_prod:
                     current_thp = data_trans_prod.pop(0)
                 else:
                     current_thp = None
-                print("current_thp: ", current_thp)
                 if current_thp: 
                     # update
                     # keep updating as long as returned list is equal
                     update_query = f'UPDATE Transactions_has_Products SET productID = {productID} WHERE transactionID = {current_thp["transactions_has_productsID"]}'
-                    print("update_query: ", update_query)
                     cur.execute(update_query,)
                 else:
                     # INSERT
                     # no more products on database but more from the form
                     insert_thp = f"INSERT INTO Transactions_has_Products (transactionID, productID) VALUES ({transactionID}, {productID});"
-                    print("insert_thp: ", insert_thp)
                     cur.execute(insert_thp,)
             
             if len(data_trans_prod) > 0:
                 for remaining in data_trans_prod:
-                    print("removing deleted: ", remaining)
                     delete_query = "DELETE FROM Transactions_has_Products WHERE transactions_has_productsID = '%s';"
                     cur.execute(delete_query, (remaining["transactions_has_productsID"],))
                     
@@ -625,14 +623,14 @@ def edit_transactions(transactionID):
             # return(request.form)
 
 
+# CITATION:
+# https://stackoverflow.com/questions/14783438/jinja2-print-to-console-or-logging
 @app.context_processor
 def utility_functions():
     def print_in_console(message):
         print(str(message))
 
     return dict(mdebug=print_in_console)
-
-
 
 
 @app.errorhandler(404)
@@ -651,4 +649,4 @@ def cannot_complete(e):
 # Listener
 
 if __name__ == "__main__":
-    app.run(port=51192, debug=True)
+    app.run(port=51192)
