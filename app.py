@@ -349,22 +349,6 @@ def edit_products(productID):
             return redirect("/products")
 
 
-# CITATION: 
-# This method was adapted for use from ChatGPT in order to solve a rendering issue with Jinja
-def convert_for_json(data):
-    if isinstance(data, dict):
-        return {k: convert_for_json(v) for k, v in data.items()}
-    elif isinstance(data, list) or isinstance(data, tuple):
-        return [convert_for_json(v) for v in data]
-    elif isinstance(data, date):
-        return data.isoformat()  # Convert to string
-    elif isinstance(data, timedelta):
-        return str(data)  # Convert to string
-    elif isinstance(data, Decimal):
-        return float(data)  # Convert to float
-    return data
-
-
 # Transactions
 @app.route('/transactions', methods=["POST","GET"])
 def transactions():
@@ -616,7 +600,7 @@ def edit_transactions(transactionID):
                 if current_thp: 
                     # update
                     # keep updating as long as returned list is equal
-                    update_query = f"UPDATE Transactions_has_Products SET productID = {productID} WHERE transactionID = {current_thp["transactions_has_productsID"]}"
+                    update_query = f'UPDATE Transactions_has_Products SET productID = {productID} WHERE transactionID = {current_thp["transactions_has_productsID"]}'
                     print("update_query: ", update_query)
                     cur.execute(update_query,)
                 else:
