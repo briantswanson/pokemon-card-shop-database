@@ -494,7 +494,7 @@ def delete_transactions(transactionID):
     query2 = "DELETE FROM Transactions WHERE transactionID = '%s';"
     cur = mysql.connection.cursor()
     cur.execute(query, (transactionID,))
-    cur.execure(query2, (transactionID,))
+    cur.execute(query2, (transactionID,))
     mysql.connection.commit()
 
     # redirect back to transactions page
@@ -577,7 +577,6 @@ def edit_transactions(transactionID):
         if request.form.get("Edit_Transaction"):
         
             # grab user form inputs
-            print(request.form)
             customerID = request.form["customer"]
             employeeID = request.form["employee"]
             transactionDate = request.form["transactionDate"]
@@ -586,8 +585,7 @@ def edit_transactions(transactionID):
             # TRANSACTION QUERY
             query1 = """
             UPDATE Transactions 
-            SET customerID = %s, employeeID = %s, transactionTime = %s, transactionDate = %s
-            WHERE transactionID = %s """
+            SET customerID = %s, employeeID = %s, transactionTime = %s, transactionDate = %s WHERE transactionID = %s """
             
             cur = mysql.connection.cursor()
             cur.execute(query1, (customerID, employeeID, transactionTime, transactionDate, transactionID))
@@ -598,36 +596,44 @@ def edit_transactions(transactionID):
 
             
             # TODO MAKE THIS COMPATIBLE WITH MULTIPLE PRODUCT UPDATES
-            # IDEA: don't allow users to remove any products from EDIT, 
-            # instead must use delete first
-            query2 = """
-            UPDATE Transactions_has_Products 
-            SET productID = %s 
-            """
+            update_all_query = "SELECT * FROM Transactions_has_Products WHERE transactionID = %s"
+            cur = mysql.connection.cursor()
+            # Execute the query with the parameters
+            cur.execute(update_all_query, (transactionID,))
+            sql_trans_prod = cur.fetchall()            
             
-            # transaction contains multiple products
-            if len(productList) > 1:
-                product_query = []
-                
-                for productID in productList:
-                    product_query.append(f"({transactionID}, {productID})")
-                 
-                query2 += ', '.join(product_query)
-        
-            # new transaction contains one product
-            else:
-                productID = productList[0]
-                query2 += f"({transactionID}, {productID})"
             
-            query2 += f"WHERE transactionID = {transactionID}"
-                
-            cur.execute(query2,)
+            data_trans_prod = list(sql_trans_prod)
+            print("data_trans_prod: ", data_trans_prod)
+            for productID in productList:
+                # ({'transactions_has_productsID': 2, 'transactionID': 2, 'productID': 29},)
+                print("productID: ", productID)
+                if data_trans_prod:
+                    current_thp = data_trans_prod.pop(0)
+                else:
+                    current_thp = None
+                print("current_thp: ", current_thp)
+                if current_thp: 
+                    # update
+                    # keep updating as long as returned list is equal
+                    update_query = f"UPDATE Transactions_has_Products SET productID = {productID} WHERE transactionID = {current_thp["transactions_has_productsID"]}"
+                    print("update_query: ", update_query)
+                    cur.execute(update_query,)
+                else:
+                    # INSERT
+                    # no more products on database but more from the form
+                    insert_thp = f"INSERT INTO Transactions_has_Products (transactionID, productID) VALUES ({transactionID}, {productID});"
+                    print("insert_thp: ", insert_thp)
+                    cur.execute(insert_thp,)
             
+            if len(data_trans_prod) > 0:
+                for remaining in data_trans_prod:
+                    print("removing deleted: ", remaining)
+                    delete_query = "DELETE FROM Transactions_has_Products WHERE transactions_has_productsID = '%s';"
+                    cur.execute(delete_query, (remaining["transactions_has_productsID"],))
+                    
 
-            # for key,val in request.form.items():
-            #     if key == "selectProduct":
-            #                     query2 = "UPDATE Transactions_has_Products SET productID = %s WHERE Transactions_has_Products.transactionID =" + str(val)
-            #                     cur.execute(query2, (transactionID,))
+
             mysql.connection.commit()
 
             # redirect back to people page after we execute the update query
