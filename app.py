@@ -464,10 +464,10 @@ def transactions():
 
         
     
-        data["transactions"] = convert_for_json(data_trans)
-        data["customers"] = convert_for_json(data_cust)
-        data["employees"] = convert_for_json(data_emp)
-        data["products"] = convert_for_json(data_prod)       
+        data["transactions"] = data_trans
+        data["customers"] = data_cust
+        data["employees"] = data_emp
+        data["products"] = data_prod       
 
     return render_template("transactions.html", data=data, header="Transactions", id_type="transactionID")
 
@@ -491,9 +491,9 @@ def edit_transactions(transactionID):
         query = """
         SELECT Transactions.transactionID, 
             Transactions.customerID, 
-            CONCAT(Customers.firstName, " ", Customers.lastName) AS Customer, 
+            CONCAT(Customers.firstName, ' ', Customers.lastName) AS Customer, 
             Transactions.employeeID, 
-            CONCAT(Employees.firstName, " ", Employees.lastName) AS Employee, 
+            CONCAT(Employees.firstName, ' ', Employees.lastName) AS Employee, 
             Transactions.transactionDate,
             Transactions.transactionTime, 
             Products.productID, 
@@ -549,10 +549,10 @@ def edit_transactions(transactionID):
         data_prod = cur_prod.fetchall()
 
         data = {}
-        data["transactions"] = convert_for_json(data_trans)
-        data["customers"] = convert_for_json(data_cust)
-        data["employees"] = convert_for_json(data_emp)
-        data["products"] = convert_for_json(data_prod) 
+        data["transactions"] = data_trans
+        data["customers"] = data_cust
+        data["employees"] = data_emp
+        data["products"] = data_prod
 
         return render_template("edit_transactions.html", data=data, header="Transactions", id_type="transactionID")
     
@@ -640,8 +640,15 @@ def page_not_found(e):
     return render_template('404.html'), 404
 
 
+@app.errorhandler(500)
+def cannot_complete(e):
+    url = request.url.split('/')
+    url_split = url[-2].split('_')
+    who = url_split[1].capitalize()
+    return render_template('cannot_complete.html', who=who, header=who)
+
+
 # Listener
 
 if __name__ == "__main__":
-    port = int(os.environ.get('PORT', 1425))
-    app.run(port=port, debug=True)
+    app.run(port=51192, debug=True)
