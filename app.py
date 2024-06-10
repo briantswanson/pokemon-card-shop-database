@@ -478,8 +478,10 @@ def delete_transactions(transactionID):
     return redirect("/transactions")
 
 
-# CITATION:
-# https://stackoverflow.com/questions/764184/how-do-i-get-time-from-a-datetime-timedelta-object
+# # Citation for the following code:
+# Date: 06/09/2024
+# Copied from: Stackoverflow: "How do I get time from a datetime.timedelta object?"
+# Source URL: https://stackoverflow.com/questions/764184/how-do-i-get-time-from-a-datetime-timedelta-object
 def convert_timedelta(data):
     for index in range(len(data)):
         value = data[index]["transactionTime"]
@@ -623,7 +625,9 @@ def edit_transactions(transactionID):
             # return(request.form)
 
 
-# CITATION:
+# Citation for the following code:
+# Date: 06/09/2024
+# Copied From: Stackoverflow: "jinja2 print to console or logging"
 # https://stackoverflow.com/questions/14783438/jinja2-print-to-console-or-logging
 @app.context_processor
 def utility_functions():
